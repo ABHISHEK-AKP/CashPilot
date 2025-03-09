@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Cash Pilot</string>
+    <string name="log_in">Sign In</string>
+    <string name="email_hint">Your Email Address</string>
+    <string name="your_password">Your Password</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="login_now">Have an Account? Sign In</string>
+    <string name="signUp_now">Do not have an Account? Create Now</string>
+    <string name="log_out">Log Out</string>
 </resources>

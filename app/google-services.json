@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "393454328873",
+    "project_id": "cash-pilot-6e32b",
+    "storage_bucket": "cash-pilot-6e32b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:393454328873:android:8954436be86d55c2ca9038",
+        "android_client_info": {
+          "package_name": "com.example.project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "393454328873-4o2qr6c2f88ulgrp5jm8cb0acit0qpaj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdEjf96sJF-iKo6hJhBclrxfLU1efjqZg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "393454328873-4o2qr6c2f88ulgrp5jm8cb0acit0qpaj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

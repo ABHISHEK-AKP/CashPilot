@@ -13,4 +13,7 @@
     <color name="grey_200">#c2c6c9</color>
     <color name="grey_100">#f3f5f6</color>
     <color name="grey_text">#afb9c1</color>
+    <color name="orange">#FF9453</color>
+    <color name="red">#DB4437</color>
+    <color name="gray_text">#8A8A8A</color>
 </resources>

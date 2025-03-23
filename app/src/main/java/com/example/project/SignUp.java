@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,7 @@ Button btnSignUp;
 ProgressBar progressBar;
 TextView logInNow;
 FirebaseAuth mAuth;
+CheckBox checkboxTerms;
     @Override
     public void onStart() {
         super.onStart();
@@ -53,6 +55,7 @@ FirebaseAuth mAuth;
         btnSignUp = findViewById(R.id.btn_signUp);
         progressBar = findViewById(R.id.progressBar);
         logInNow = findViewById(R.id.loginNow);
+        checkboxTerms = findViewById(R.id.checkbox_terms);
         logInNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +77,11 @@ FirebaseAuth mAuth;
                 }
                 if(TextUtils.isEmpty(password)){
                     Toast.makeText(SignUp.this,"Enter Password",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!checkboxTerms.isChecked()) {
+                    Toast.makeText(SignUp.this, "Please agree to the Terms and Privacy Policy.", Toast.LENGTH_SHORT).show();
+                    progressBar.setVisibility(View.GONE);
                     return;
                 }
                 mAuth.createUserWithEmailAndPassword(email, password)

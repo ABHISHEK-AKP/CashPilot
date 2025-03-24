@@ -7,21 +7,25 @@
     <!-- Menu Item -->
     <TextView style="@style/DrawerItemStyle"
         android:text="Home"
-        android:drawableStart="@drawable/ic_home" />
+        android:drawableStart="@drawable/ic_home"
+        android:id="@+id/home_nav"/>
 
     <TextView style="@style/DrawerItemStyle"
         android:text="Reports"
         android:drawableStart="@drawable/ic_report"
         android:background="@color/orange"
-        android:textColor="@color/orange" />
+        android:textColor="@color/orange"
+        android:id="@+id/reports_nav"/>
 
     <TextView style="@style/DrawerItemStyle"
         android:text="Scan Receipts"
-        android:drawableStart="@drawable/ic_scan" />
+        android:drawableStart="@drawable/ic_scan"
+        android:id="@+id/scan_receipts_nav"/>
 
     <TextView style="@style/DrawerItemStyle"
         android:text="Profile"
-        android:drawableStart="@drawable/ic_profile" />
+        android:drawableStart="@drawable/ic_profile"
+        android:id="@+id/profile_nav"/>
 
     <!-- Spacer -->
     <View

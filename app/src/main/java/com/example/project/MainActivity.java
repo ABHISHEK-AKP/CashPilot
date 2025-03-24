@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
     ImageView menuIcon, closeDrawerIcon;
-    TextView logout;
+    TextView logout,home,report,scan_rcpt,profile,user_name,user_email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +33,18 @@ public class MainActivity extends AppCompatActivity {
         menuIcon = findViewById(R.id.menu_icon);
         closeDrawerIcon = findViewById(R.id.close_drawer);
         logout = findViewById(R.id.logout);
+        home = findViewById(R.id.home_nav);
+        report = findViewById(R.id.reports_nav);
+        scan_rcpt = findViewById(R.id.scan_receipts_nav);
+        profile = findViewById(R.id.profile_nav);
+        user_name = findViewById(R.id.profile_name);
+        user_email = findViewById(R.id.profile_email);
+        Intent intent = getIntent();
+        String userName = intent.getStringExtra("userName");
+        String userEmail = intent.getStringExtra("userEmail");
+        String userPhotoUrl = intent.getStringExtra("userPhotoUrl");
+        user_name.setText(userName != null ? userName : "No Name");
+        user_email.setText(userEmail!=null?userEmail:"No Email");
 
         // Open drawer on hamburger icon click
         menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
@@ -46,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, LogIn.class));
             finish();
         });
+
 
         // Handle padding for notch/status bar
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_content), (v, insets) -> {

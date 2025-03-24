@@ -52,6 +52,12 @@ public class LogIn extends AppCompatActivity {
             FirebaseUser currentUser = mAuth.getCurrentUser();
             if (currentUser != null) {
                 Intent mainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
+                String userName = currentUser.getDisplayName();
+                String userEmail = currentUser.getEmail();
+                String userPhotoUrl = (currentUser.getPhotoUrl() != null) ? currentUser.getPhotoUrl().toString() : "";
+                mainActivityIntent.putExtra("userName", userName);
+                mainActivityIntent.putExtra("userEmail", userEmail);
+                mainActivityIntent.putExtra("userPhotoUrl", userPhotoUrl);
                 startActivity(mainActivityIntent);
                 finish();
             }
@@ -168,10 +174,19 @@ public class LogIn extends AppCompatActivity {
 
                             mAuth.signInWithCredential(authCredential).addOnCompleteListener(task -> {
                                 if (task.isSuccessful()) {
+                                    FirebaseUser user = mAuth.getCurrentUser();
                                     Toast.makeText(LogIn.this, "Successfully logged in", Toast.LENGTH_SHORT).show();
                                     Intent mainActivityIntent = new Intent(getApplicationContext(), MainActivity.class);
-                                    startActivity(mainActivityIntent);
-                                    finish();
+                                    if (user != null) {
+                                        String userName = user.getDisplayName();
+                                        String userEmail = user.getEmail();
+                                        String userPhotoUrl = (user.getPhotoUrl() != null) ? user.getPhotoUrl().toString() : "";
+                                        mainActivityIntent.putExtra("userName", userName);
+                                        mainActivityIntent.putExtra("userEmail", userEmail);
+                                        mainActivityIntent.putExtra("userPhotoUrl", userPhotoUrl);
+                                        startActivity(mainActivityIntent);
+                                        finish();
+                                    }
                                 } else {
                                     Toast.makeText(LogIn.this, "Failed Log in: " + task.getException(), Toast.LENGTH_SHORT).show();
                                 }

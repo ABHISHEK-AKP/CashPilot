@@ -1,48 +1,129 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:id="@+id/main"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    tools:context=".LogIn"-->
+<!--    android:orientation="vertical"-->
+<!--    android:gravity="center">-->
+<!--<TextView-->
+<!--    android:text="@string/log_in"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"/>-->
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content">-->
+<!--        <com.google.android.material.textfield.TextInputEditText-->
+<!--            android:id="@+id/email"-->
+<!--            android:hint="@string/email_hint"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"/>-->
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+<!--    <com.google.android.material.textfield.TextInputLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content">-->
+<!--        <com.google.android.material.textfield.TextInputEditText-->
+<!--            android:id="@+id/password"-->
+<!--            android:hint="@string/your_password"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"/>-->
+<!--    </com.google.android.material.textfield.TextInputLayout>-->
+<!--    <ProgressBar-->
+<!--        android:id="@+id/progressBar"-->
+<!--        android:visibility="gone"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"/>-->
+<!--    <Button-->
+<!--        android:id="@+id/btn_login"-->
+<!--        android:text="@string/log_in"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"/>-->
+<!--    <TextView-->
+<!--        android:id="@+id/signUpNow"-->
+<!--        android:text="@string/signUp_now"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"/>-->
+<!--</LinearLayout>-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LogIn"
-    android:orientation="vertical"
-    android:gravity="center">
-<TextView
-    android:text="@string/log_in"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
-    <com.google.android.material.textfield.TextInputLayout
+    android:gravity="center"
+    tools:context=".LogIn">
+
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <com.google.android.material.textfield.TextInputEditText
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/logo"
+            android:layout_gravity="center_horizontal" />
+
+
+
+        <EditText
             android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:hint="@string/email_hint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <com.google.android.material.textfield.TextInputEditText
+            android:inputType="textEmailAddress"
+            android:layout_marginTop="24dp" />
+
+        <EditText
             android:id="@+id/password"
-            android:hint="@string/your_password"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-    </com.google.android.material.textfield.TextInputLayout>
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <Button
-        android:id="@+id/btn_login"
-        android:text="@string/log_in"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-    <TextView
-        android:id="@+id/signUpNow"
-        android:text="@string/signUp_now"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
-</LinearLayout>
+            android:layout_height="wrap_content"
+            android:hint="@string/your_password"
+            android:inputType="textPassword"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/log_in"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/orange"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/forgot_password"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@android:color/darker_gray"
+            android:layout_marginTop="12dp" />
+
+        <Button
+            android:id="@+id/btn_google_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/log_in_google"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="@color/red"
+            android:textColor="@android:color/white" />
+
+        <TextView
+            android:id="@+id/signUpNow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/signUp_now"
+            android:textColor="@color/orange"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp" />
+        <ProgressBar
+                android:id="@+id/progressBar"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+    </LinearLayout>
+</ScrollView>

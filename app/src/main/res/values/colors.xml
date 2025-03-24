@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="orange">#ff9453</color>
 <!--    <color name="purple_500">#FF6200EE</color>-->
 <!--    <color name="purple_700">#FF3700B3</color>-->
     <color name="teal_200">#7fe1ad</color>
@@ -14,6 +13,6 @@
     <color name="grey_100">#f3f5f6</color>
     <color name="grey_text">#afb9c1</color>
     <color name="orange">#FF9453</color>
-    <color name="red">#DB4437</color>
+    <color name="orange_200">#FF9453</color>
     <color name="gray_text">#8A8A8A</color>
 </resources>

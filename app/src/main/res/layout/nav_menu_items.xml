@@ -1,0 +1,38 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:orientation="vertical">
+
+    <!-- Menu Item -->
+    <TextView style="@style/DrawerItemStyle"
+        android:text="Home"
+        android:drawableStart="@drawable/ic_home" />
+
+    <TextView style="@style/DrawerItemStyle"
+        android:text="Reports"
+        android:drawableStart="@drawable/ic_report"
+        android:background="@color/orange"
+        android:textColor="@color/orange" />
+
+    <TextView style="@style/DrawerItemStyle"
+        android:text="Scan Receipts"
+        android:drawableStart="@drawable/ic_scan" />
+
+    <TextView style="@style/DrawerItemStyle"
+        android:text="Profile"
+        android:drawableStart="@drawable/ic_profile" />
+
+    <!-- Spacer -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Logout -->
+    <TextView style="@style/DrawerItemStyle"
+        android:id="@+id/logout"
+        android:text="Logout"
+        android:drawableStart="@drawable/ic_logout"
+        android:textColor="@color/red" />
+</LinearLayout>

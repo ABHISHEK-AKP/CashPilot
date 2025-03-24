@@ -14,12 +14,13 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
     DrawerLayout drawerLayout;
-    ImageView menuIcon, closeDrawerIcon;
+    ImageView menuIcon, closeDrawerIcon,profile_image;
     TextView logout,home,report,scan_rcpt,profile,user_name,user_email;
 
     @Override
@@ -39,12 +40,20 @@ public class MainActivity extends AppCompatActivity {
         profile = findViewById(R.id.profile_nav);
         user_name = findViewById(R.id.profile_name);
         user_email = findViewById(R.id.profile_email);
+        profile_image = findViewById(R.id.profile_image);
         Intent intent = getIntent();
         String userName = intent.getStringExtra("userName");
         String userEmail = intent.getStringExtra("userEmail");
         String userPhotoUrl = intent.getStringExtra("userPhotoUrl");
         user_name.setText(userName != null ? userName : "No Name");
         user_email.setText(userEmail!=null?userEmail:"No Email");
+        if (userPhotoUrl != null && !userPhotoUrl.isEmpty()) {
+            Glide.with(this)
+                    .load(userPhotoUrl)
+                    .placeholder(R.drawable.ic_profile)
+                    .circleCrop()
+                    .into(profile_image);
+        }
 
         // Open drawer on hamburger icon click
         menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));

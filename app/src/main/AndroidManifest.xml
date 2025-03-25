@@ -14,9 +14,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Project"
         tools:targetApi="31">
-        <activity
-            android:name=".Reports"
-            android:exported="false" />
+        <activity android:name=".Reports"
+            android:exported="true"/>
+        <activity android:name=".Reccomend"
+            android:exported="true"/>
+        <activity android:name=".ScanReciptsActivity"
+            android:exported="true"/>
+        <activity android:name=".AddExpense"
+            android:exported="true"/>
         <activity
             android:name=".MainActivity"
             android:exported="true" />

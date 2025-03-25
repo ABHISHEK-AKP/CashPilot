@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Expense Manually"
+        android:paddingTop="70dp"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/quicksand"
+        android:textColor="@color/black"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Amount -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Amount"
+        android:textColor="@color/orange"
+        android:textStyle="bold"
+        android:fontFamily="@font/quicksand" />
+
+    <EditText
+        android:id="@+id/editAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount"
+        android:inputType="numberDecimal"
+        android:textColorHint="@color/gray_text"
+        android:fontFamily="@font/quicksand"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Purpose -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter Purpose"
+        android:textColor="@color/orange"
+        android:textStyle="bold"
+        android:fontFamily="@font/quicksand" />
+
+    <EditText
+        android:id="@+id/editPurpose"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Purpose"
+        android:textColorHint="@color/gray_text"
+        android:fontFamily="@font/quicksand"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Date Picker -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Date"
+        android:textColor="@color/orange"
+        android:textStyle="bold"
+        android:fontFamily="@font/quicksand" />
+
+    <TextView
+        android:id="@+id/textDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tap to select date"
+        android:textColorHint="@color/gray_text"
+        android:textColor="@color/black"
+        android:background="@android:color/transparent"
+        android:padding="12dp"
+        android:layout_marginBottom="24dp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type"
+        android:textColor="@color/orange"
+        android:textStyle="bold"
+        android:fontFamily="@font/quicksand" />
+
+    <Spinner
+        android:id="@+id/typeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp" />
+
+    <!-- Add Button -->
+    <Button
+        android:id="@+id/btnAddExpense"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ADD"
+        android:textAllCaps="true"
+        android:backgroundTint="@color/orange"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:fontFamily="@font/quicksand" />
+</LinearLayout>

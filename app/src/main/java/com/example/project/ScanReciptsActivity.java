@@ -31,8 +31,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ScanReciptsActivity extends AppCompatActivity {
+    private static final String TAG = "ScanReciptsActivity";
     private static final int CAMERA_PERMISSION_CODE = 100;
 
     private PreviewView previewView;
@@ -42,7 +45,7 @@ public class ScanReciptsActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private String selectedDate = "";
 
-    // Create an instance of our receipt categorizer
+    // Receipt analysis components
     private ReceiptCategorizer categorizer;
 
     @Override
@@ -51,7 +54,7 @@ public class ScanReciptsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scan);
 
         try {
-            // Initialize our receipt categorizer
+            // Initialize receipt analysis tools
             categorizer = new ReceiptCategorizer();
 
             previewView = findViewById(R.id.previewView);
@@ -74,9 +77,11 @@ public class ScanReciptsActivity extends AppCompatActivity {
             // Capture image and analyze it
             btnCapture.setOnClickListener(v -> {
                 try {
+                    btnCapture.setEnabled(false);
+                    btnNavigate.setEnabled(false);
                     captureImage();
                 } catch (Exception e) {
-                    Log.e("CAPTURE_ERROR", "Error capturing image: " + e.getMessage());
+                    Log.e(TAG, "Error capturing image: " + e.getMessage());
                     e.printStackTrace();
                 }
             });
@@ -87,12 +92,12 @@ public class ScanReciptsActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, AddExpense.class);
                     startActivity(intent);
                 } catch (Exception e) {
-                    Log.e("NAVIGATE_ERROR", "Error navigating to activity: " + e.getMessage());
+                    Log.e(TAG, "Error navigating to activity: " + e.getMessage());
                 }
             });
 
         } catch (Exception e) {
-            Log.e("ONCREATE_ERROR", "Error initializing activity: " + e.getMessage());
+            Log.e(TAG, "Error initializing activity: " + e.getMessage());
             e.printStackTrace();
             Toast.makeText(this, "Failed to initialize activity", Toast.LENGTH_SHORT).show();
         }
@@ -111,7 +116,7 @@ public class ScanReciptsActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception e) {
-            Log.e("PERMISSION_ERROR", "Error handling permissions: " + e.getMessage());
+            Log.e(TAG, "Error handling permissions: " + e.getMessage());
         }
     }
 
@@ -131,13 +136,13 @@ public class ScanReciptsActivity extends AppCompatActivity {
                     preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
                 } catch (Exception e) {
-                    Log.e("CAMERA_ERROR", "Failed to start camera: " + e.getMessage());
+                    Log.e(TAG, "Failed to start camera: " + e.getMessage());
                     Toast.makeText(this, "Failed to start camera", Toast.LENGTH_SHORT).show();
                 }
             }, ContextCompat.getMainExecutor(this));
 
         } catch (Exception e) {
-            Log.e("CAMERA_INIT_ERROR", "Error initializing camera: " + e.getMessage());
+            Log.e(TAG, "Error initializing camera: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -158,13 +163,13 @@ public class ScanReciptsActivity extends AppCompatActivity {
 
                         @Override
                         public void onError(@NonNull ImageCaptureException exception) {
-                            Log.e("CAPTURE_ERROR", "Capture failed: " + exception.getMessage());
+                            Log.e(TAG, "Capture failed: " + exception.getMessage());
                             Toast.makeText(ScanReciptsActivity.this, "Capture failed", Toast.LENGTH_SHORT).show();
                         }
                     });
 
         } catch (Exception e) {
-            Log.e("CAPTURE_EXCEPTION", "Failed to capture image: " + e.getMessage());
+            Log.e(TAG, "Failed to capture image: " + e.getMessage());
             e.printStackTrace();
             Toast.makeText(this, "Failed to capture image", Toast.LENGTH_SHORT).show();
         }
@@ -172,6 +177,8 @@ public class ScanReciptsActivity extends AppCompatActivity {
 
     private void analyzeImage(File photoFile) {
         try {
+            Toast.makeText(this, "Analyzing receipt...", Toast.LENGTH_SHORT).show();
+
             InputImage image = InputImage.fromFilePath(this, Uri.fromFile(photoFile));
 
             TextRecognizer recognizer = TextRecognition.getClient(
@@ -181,12 +188,12 @@ public class ScanReciptsActivity extends AppCompatActivity {
             recognizer.process(image)
                     .addOnSuccessListener(this::processExtractedText)
                     .addOnFailureListener(e -> {
-                        Log.e("ML_KIT_ERROR", "Failed to analyze image: " + e.getMessage());
+                        Log.e(TAG, "Failed to analyze image: " + e.getMessage());
                         Toast.makeText(this, "Failed to analyze image", Toast.LENGTH_SHORT).show();
                     });
 
         } catch (Exception e) {
-            Log.e("ANALYZE_ERROR", "Exception in analyzeImage: " + e.getMessage());
+            Log.e(TAG, "Exception in analyzeImage: " + e.getMessage());
             e.printStackTrace();
             Toast.makeText(this, "Failed to analyze image", Toast.LENGTH_SHORT).show();
         }
@@ -202,16 +209,10 @@ public class ScanReciptsActivity extends AppCompatActivity {
             }
 
             // Log the extracted text for debugging
-            Log.d("RECEIPT_TEXT", "Extracted text: " + extractedText);
-
-            // Use our local categorizer to determine the expense category
-            String category = categorizer.categorizeReceipt(extractedText);
-
-            // Extract the amount from the receipt
-            double amount = categorizer.extractAmount(extractedText);
+            Log.d(TAG, "Extracted text: " + extractedText);
 
             // Try to extract date from receipt
-            String extractedDate = categorizer.extractDate(extractedText);
+            String extractedDate = extractDate(extractedText);
             if (!extractedDate.isEmpty()) {
                 selectedDate = extractedDate;
             } else {
@@ -220,32 +221,122 @@ public class ScanReciptsActivity extends AppCompatActivity {
                 selectedDate = sdf.format(new Date());
             }
 
-            // Show a toast with the detected category and amount
-            Toast.makeText(this, "Category: " + category + ", Amount: $" + String.format("%.2f", amount),
-                    Toast.LENGTH_LONG).show();
+            // Categorize the receipt - this will be used as the "purpose" in your model
+            String purpose = categorizer.categorizeReceipt(extractedText);
 
-            // Save the expense to Firestore
-            saveToFirestore(category, amount);
+            // Extract ONLY the total amount
+            double totalAmount = extractTotalAmount(extractedText);
+
+            if (totalAmount <= 0) {
+                Toast.makeText(this, "Could not find valid total amount on receipt", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Show success toast
+            Toast.makeText(this, "Found receipt total: $" + String.format("%.2f", totalAmount), Toast.LENGTH_SHORT).show();
+
+            // Save to Firestore using your existing model structure
+            saveToFirestore(purpose, totalAmount);
 
         } catch (Exception e) {
-            Log.e("PROCESS_ERROR", "Failed to process text: " + e.getMessage());
+            Log.e(TAG, "Failed to process text: " + e.getMessage());
             e.printStackTrace();
+            Toast.makeText(this, "Error processing receipt", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void saveToFirestore(String category, double amount) {
+    /**
+     * Extract the total amount from the receipt text
+     * Focuses on finding the final amount with tax included
+     */
+    private double extractTotalAmount(String receiptText) {
+        double totalAmount = 0.0;
+
+        try {
+            // First try to find lines with "total" keyword
+            Pattern totalPattern = Pattern.compile("(?i)\\b(total|amount due|grand total|amount|balance|due|pay)\\s*:?\\s*\\$?\\s*(\\d+\\.\\d{2})\\b");
+            Matcher totalMatcher = totalPattern.matcher(receiptText);
+
+            // Find all matches and get the last one (usually the final total)
+            double lastTotal = 0.0;
+            while (totalMatcher.find()) {
+                try {
+                    lastTotal = Double.parseDouble(totalMatcher.group(2));
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+            }
+
+            if (lastTotal > 0.0) {
+                return lastTotal;
+            }
+
+            // If no "total" keyword was found, look for the last dollar amount in the receipt
+            // (often the total is the last amount mentioned)
+            Pattern amountPattern = Pattern.compile("\\$?\\s*(\\d+\\.\\d{2})");
+            Matcher amountMatcher = amountPattern.matcher(receiptText);
+
+            double lastAmount = 0.0;
+            while (amountMatcher.find()) {
+                try {
+                    lastAmount = Double.parseDouble(amountMatcher.group(1));
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+            }
+
+            if (lastAmount > 0.0) {
+                return lastAmount;
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error extracting total amount: " + e.getMessage());
+        }
+
+        return totalAmount;
+    }
+
+    /**
+     * Extract date from receipt text
+     */
+    private String extractDate(String text) {
+        try {
+            // Look for common date formats: MM/DD/YYYY, MM-DD-YYYY, etc.
+            Pattern datePattern = Pattern.compile("\\b(\\d{1,2}[/-]\\d{1,2}[/-]\\d{2,4})\\b");
+            Matcher dateMatcher = datePattern.matcher(text);
+
+            if (dateMatcher.find()) {
+                return dateMatcher.group(1);
+            }
+
+            // Try another format: Month name DD, YYYY
+            Pattern textDatePattern = Pattern.compile("\\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \\d{1,2},? \\d{2,4}\\b", Pattern.CASE_INSENSITIVE);
+            Matcher textDateMatcher = textDatePattern.matcher(text);
+
+            if (textDateMatcher.find()) {
+                return textDateMatcher.group(0);
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error extracting date: " + e.getMessage());
+        }
+
+        return "";
+    }
+
+    private void saveToFirestore(String purpose, double amount) {
         try {
             // Verify we have valid data
-            if (category == null || category.isEmpty() || amount <= 0) {
-                Log.w("FIRESTORE_SAVE", "Invalid data - category: " + category + ", amount: " + amount);
+            if (purpose == null || purpose.isEmpty() || amount <= 0) {
+                Log.w(TAG, "Invalid data - purpose: " + purpose + ", amount: " + amount);
                 Toast.makeText(this, "Could not save: Invalid expense data", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Create a Spending object
+            // Create a Spending object using your existing model
             Spending spending = new Spending(
-                    String.valueOf(amount),  // Amount
-                    category,                // Category
+                    String.valueOf(amount),  // Amount as string
+                    purpose,                 // Purpose (what was category before)
                     selectedDate,            // Date
                     "out"                    // Type (expenditure)
             );
@@ -254,20 +345,23 @@ public class ScanReciptsActivity extends AppCompatActivity {
             db.collection("expenses")
                     .add(spending)
                     .addOnSuccessListener(documentReference -> {
-                        Toast.makeText(this, "Saved: " + category + " - $" + String.format("%.2f", amount),
+                        Toast.makeText(this, "Saved: " + purpose + " - $" + String.format("%.2f", amount),
                                 Toast.LENGTH_SHORT).show();
+                        Intent mainActivityintent = new Intent(getApplicationContext(), MainActivity.class);
+                        startActivity(mainActivityintent);
+                        finish();
 
                         // Optionally, navigate to expense list or dashboard after saving
                         // Intent intent = new Intent(this, ExpenseListActivity.class);
                         // startActivity(intent);
                     })
                     .addOnFailureListener(e -> {
-                        Log.e("FIRESTORE_ERROR", "Failed to save: " + e.getMessage());
+                        Log.e(TAG, "Failed to save: " + e.getMessage());
                         Toast.makeText(this, "Failed to save expense", Toast.LENGTH_SHORT).show();
                     });
 
         } catch (Exception e) {
-            Log.e("SAVE_ERROR", "Exception while saving to Firestore: " + e.getMessage());
+            Log.e(TAG, "Exception while saving to Firestore: " + e.getMessage());
             Toast.makeText(this, "Failed to save expense", Toast.LENGTH_SHORT).show();
         }
     }
@@ -278,7 +372,7 @@ public class ScanReciptsActivity extends AppCompatActivity {
         try {
             cameraExecutor.shutdown();
         } catch (Exception e) {
-            Log.e("DESTROY_ERROR", "Failed to shut down executor: " + e.getMessage());
+            Log.e(TAG, "Failed to shut down executor: " + e.getMessage());
         }
     }
 }

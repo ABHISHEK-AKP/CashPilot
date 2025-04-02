@@ -1,4 +1,5 @@
 package com.example.project;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -19,12 +20,13 @@ import com.example.project.adapters.SpendingAdapter;
 import com.example.project.models.Spending;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -84,24 +86,23 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "You're already on Home", Toast.LENGTH_SHORT).show();
         });
 
-// Reports
+        // Reports
         report.setOnClickListener(v -> {
             drawerLayout.closeDrawer(GravityCompat.START);
             startActivity(new Intent(MainActivity.this, Reports.class));
         });
 
-// Scan Receipts
+        // Scan Receipts
         scan_rcpt.setOnClickListener(v -> {
             drawerLayout.closeDrawer(GravityCompat.START);
             startActivity(new Intent(MainActivity.this, ScanReciptsActivity.class));
         });
 
-// Budgeting Recommendations
+        // Budgeting Recommendations
         profile.setOnClickListener(v -> {
             drawerLayout.closeDrawer(GravityCompat.START);
             startActivity(new Intent(MainActivity.this, Reccomend.class));
         });
-
 
         // Layout insets (status bar)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main_content), (v, insets) -> {
@@ -123,19 +124,22 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        fetchExpenses();
+        fetchConsolidatedExpenses();
     }
 
-    private void fetchExpenses() {
+    private void fetchConsolidatedExpenses() {
         CollectionReference expensesRef = db.collection("expenses");
 
         expensesRef.addSnapshotListener((snapshot, e) -> {
-            spendingList.clear();
             if (e != null || snapshot == null) {
                 Toast.makeText(this, "Failed to fetch data", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            // Temporary list to hold all expenses
+            List<Spending> allExpenses = new ArrayList<>();
+
+            // First, extract all expenses from the snapshot
             for (DocumentSnapshot doc : snapshot.getDocuments()) {
                 String amount = doc.getString("amount");
                 String purpose = doc.getString("purpose");
@@ -143,10 +147,49 @@ public class MainActivity extends AppCompatActivity {
                 String type = doc.getString("type");
 
                 if (amount != null && purpose != null && date != null && type != null) {
-                    spendingList.add(new Spending(amount, purpose, date, type));
+                    allExpenses.add(new Spending(amount, purpose, date, type));
                 }
             }
 
+            // Now consolidate expenses by purpose
+            Map<String, Spending> consolidatedMap = new HashMap<>();
+
+            for (Spending expense : allExpenses) {
+                String purpose = expense.getPurpose();
+
+                if (consolidatedMap.containsKey(purpose)) {
+                    // Purpose exists, add to the total
+                    Spending existing = consolidatedMap.get(purpose);
+
+                    try {
+                        double currentAmount = Double.parseDouble(existing.getAmount());
+                        double newAmount = Double.parseDouble(expense.getAmount());
+                        double totalAmount = currentAmount + newAmount;
+
+                        // Create an updated spending with the new total
+                        Spending updated = new Spending(
+                                String.format("%.2f", totalAmount),  // Formatted amount with 2 decimal places
+                                purpose,                             // Same purpose
+                                expense.getDate(),                   // Keep the date (could be most recent)
+                                expense.getType()                    // Same type
+                        );
+
+                        consolidatedMap.put(purpose, updated);
+                    } catch (NumberFormatException ex) {
+                        // Handle case where amount is not a valid number
+                        // Just keep the existing entry
+                    }
+                } else {
+                    // New purpose, add to the map
+                    consolidatedMap.put(purpose, expense);
+                }
+            }
+
+            // Clear existing list and add consolidated expenses
+            spendingList.clear();
+            spendingList.addAll(consolidatedMap.values());
+
+            // Update UI
             if (spendingList.isEmpty()) {
                 recyclerView.setVisibility(View.GONE);
                 emptyMessage.setVisibility(View.VISIBLE);
@@ -158,8 +201,4 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-
 }

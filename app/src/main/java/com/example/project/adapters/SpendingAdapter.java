@@ -1,5 +1,7 @@
 package com.example.project.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.project.ExpenseDetailActivity;
 import com.example.project.R;
 import com.example.project.models.Spending;
 
@@ -15,8 +18,8 @@ import java.util.List;
 
 public class SpendingAdapter extends RecyclerView.Adapter<SpendingAdapter.ViewHolder> {
 
-    List<Spending> spendingList;
-    TextView textType;
+    private List<Spending> spendingList;
+    private Context context;
 
     public SpendingAdapter(List<Spending> spendingList) {
         this.spendingList = spendingList;
@@ -24,6 +27,7 @@ public class SpendingAdapter extends RecyclerView.Adapter<SpendingAdapter.ViewHo
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView textPurpose, textAmount, textDate, textType;
+        View itemContainer;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -31,14 +35,15 @@ public class SpendingAdapter extends RecyclerView.Adapter<SpendingAdapter.ViewHo
             textAmount = itemView.findViewById(R.id.item_amount);
             textDate = itemView.findViewById(R.id.item_date);
             textType = itemView.findViewById(R.id.item_type);
-
+            itemContainer = itemView;
         }
     }
 
     @NonNull
     @Override
     public SpendingAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        context = parent.getContext();
+        View view = LayoutInflater.from(context)
                 .inflate(R.layout.item_spending, parent, false);
         return new ViewHolder(view);
     }
@@ -50,6 +55,13 @@ public class SpendingAdapter extends RecyclerView.Adapter<SpendingAdapter.ViewHo
         holder.textAmount.setText("CAD " + spending.getAmount());
         holder.textDate.setText(spending.getDate());
         holder.textType.setText(spending.getType());
+
+        // Add click listener to navigate to detail view
+        holder.itemContainer.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ExpenseDetailActivity.class);
+            intent.putExtra("categoryName", spending.getPurpose());
+            context.startActivity(intent);
+        });
     }
 
     @Override
